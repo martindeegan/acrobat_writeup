@@ -135,14 +135,14 @@ In order to do that, we need to know the relative poses of our IMU and camera. W
 	\draw [dashed] (0, 0, 0) -- (0, 0, 0) node [left] {$\mathcal{F}_o$};
 	
 	% Camera frame
-	\draw [red, ->] (0, -1, -4) -- (0.002, -0.93, -4.997) node [right] {$x_o$};
-	\draw [green, ->] (0, -1, -4) -- (0.997, -0.998, -4.07) node [right] {$y_o$};
-	\draw [blue, ->] (0, -1, -4) -- (0.07, -1.995, -4.002) node [right] {$z_o$};
+	\draw [red, ->] (0, -1, -4) -- (0.002, -0.93, -4.997) node [right] {$x_d$};
+	\draw [green, ->] (0, -1, -4) -- (0.997, -0.998, -4.07) node [right] {$y_d$};
+	\draw [blue, ->] (0, -1, -4) -- (0.07, -1.995, -4.002) node [right] {$z_d$};
 	\draw [dashed] (-0.2, -1, -4) -- (-0.2, -1, -4) node [above] {$\mathcal{F}_c$};
 	% IMU frame
-	\draw [red, ->] (0, 2, 0) -- (0.009, 2.14, -0.99) node [right] {$x_o$};
-	\draw [green, ->] (0, 2, 0) -- (0.99, 1.85, 0.009) node [right] {$y_o$};
-	\draw [blue, ->] (0, 2, 0) -- (0.14, 0.98, -0.14) node [right] {$z_o$};
+	\draw [red, ->] (0, 2, 0) -- (0.009, 2.14, -0.99) node [right] {$x_i$};
+	\draw [green, ->] (0, 2, 0) -- (0.99, 1.85, 0.009) node [right] {$y_i$};
+	\draw [blue, ->] (0, 2, 0) -- (0.14, 0.98, -0.14) node [right] {$z_i$};
 	\draw [dashed] (0, 2, 0) -- (0, 2, 0) node [left] {$\mathcal{F}_i$};
 	
 	\draw [black, dashed] (0, 0, 0) -- (0, -1, -4) node [midway, below] {$\pose{c}{o}$};
@@ -165,14 +165,52 @@ State prior factors are mono factors which act on the oldest state vertex in the
 \subsection{IMU}
 The IMU is running at a much higher frequency than the camera. We can pre-integrate the IMU measurements into a single transformation between state vertices.
 
+Our state tracks $\dot X_t$, but we only need angular rates. So we can take 3 rows from $\dot X_t$ to get $\omega$.
+
+\begin{align}
+	f_{gyro} (\omega, b_g, L_g, \text{Ad}_{\pose{i}{o}}) &= L_g \left(\text{Ad}_{\pose{i}{o}}\omega + b_g\right)
+\end{align}
+
 \subsection{Vision Factors}
 Using projective geometry to track feature in the world. Possibly ORB features.
 
 \subsection{Zero Velocity Factors} 
 When we know the vehicle is on the ground (such as on start), we can add zero velocity factors which constrain angular and linear velocities. This will allow us to quickly observe gyroscope bias.
+
 \subsection{Tracking Camera Factors}
 
+\subsection{Structure Factors?}
+Not sure how we are going to estimate 
+
 \subsection{GPS Factors}
+
+\begin{figure}
+\centering
+\begin{tikzpicture}
+\begin{scope}[every node/.style={circle,thick,draw}]
+\node (X1) at (0,0) {$x_1$};
+\node (X2) at (3,1)  {$x_2$};
+\node (X3) at (6,1.3)  {$x_3$};
+\node (X4) at (9,1)  {$x_4$};
+\node (X5) at (12,0)  {$x_5$};
+\end{scope}
+
+\begin{scope}[every node/.style={square,thick,draw}]
+\node (Cintr) at (5, 5) {$K$};
+\node (Cintr) at (6, 5) {$g$};
+\end{scope}
+
+
+
+\begin{scope}[>={[black]}, every node/.style={fill=white,circle}, every edge/.style={draw=black,dashed}]
+
+%\path [->] (D) edge node {$3$} (E);
+
+%\path [->] (B) edge[bend right=60] node {$1$} (E); 
+\end{scope}
+
+\end{tikzpicture}
+\end{figure}
 
 \section{Calibration}
 We have many parameters to calibrate on our system. Namely, our sensor intrinsics and extrinsics. We can break down our calibration into stages to restrict our nonlinear least squares optimization problem to fewer variable. This will speed up calibration speeds as well as improving the solution (assuming previous steps have good solutions).

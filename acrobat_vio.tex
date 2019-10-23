@@ -1,0 +1,77 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+\usepackage{enumerate}
+\usepackage{color}
+\usepackage[margin=1in, top=.5in]{geometry}
+\usepackage{float}
+\usepackage[parfill]{parskip}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+ 
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+
+\newenvironment{problem}[2][Problem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+%If you want to title your bold things something different just make another thing exactly like this but replace "problem" with the name of the thing you want, like theorem or lemma or whatever
+
+%%This optional package allows you to use TikZ to typeset automata
+%\usepackage{tikz}
+%\usetikzlibrary{automata}
+%
+%%This optional package allows you to use xypic to typeset automata
+%\usepackage[all]{xy}
+%
+%%This optional package allows you to include external graphics
+\usepackage{graphicx}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%    FILL THESE FIELDS IN
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{Visual Inertial Odometry}
+\author{Martin Deegan}
+ 
+\begin{document}
+ 
+\maketitle
+\tableofcontents
+
+\section{Vertices}
+\subsection{Pose Vertex}
+\subsection{World Parameters}
+\subsection{Varying IMU Parameters}
+\subsection{Camera Intrinsic Parameters}
+\subsection{IMU Intrinsic Parameters}
+\subsection{Extrinsic Parameters}
+
+\section{Factors}
+\subsection{IMU}
+\subsection{Vision Factors}
+\subsection{Zero Velocity Factors}
+\subsection{Tracking Camera Factors}
+\section{Calibration}
+\subsection{GPS Factors}
+
+\section{Calibration}
+We have many parameters to calibrate on our system. Namely, our sensor intrinsics and extrinsics. We can break down our calibration into stages to restrict our nonlinear least squares optimization problem to fewer variable. This will speed up calibration speeds as well as improving the solution (assuming previous steps have good solutions).
+
+\subsection{Setup}
+Calibration should take place in a motion tracking environment such as a Qualisys, Optitrack, or Vicon camera system.
+
+There should be a checkerboard for camera intrinsics calibration.
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.5\textwidth]{checkerboard}
+\end{figure}
+
+\subsection{Camera Intrinsics Calibration}
+
+\subsection{Gyro Bias Calibration}
+\subsection{Final Calibration}
+\end{document}

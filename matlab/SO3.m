@@ -7,29 +7,30 @@ classdef SO3
         matrix = eye(3);
    end
    methods
+        function R = SO3(rot_mat)
+           assert(size(rot_mat, 1) == SO3.dim);
+           assert(size(rot_mat, 2) == SO3.dim);
+           assert(abs(det(rot_mat) - 1) <= 1e-6);
+           assert(norm(rot_mat * rot_mat' - eye(3)) <= 1e-6);
+           R.matrix = rot_mat;
+        end
+
         function result = mtimes(a, b)
-            if(isa(b, 'SO3'))
+            if isa(b, 'SO3')
                 result = SO3(a.matrix * b.matrix);
-            else(size(b, 2) == 1)
+            else
                 result = a.matrix * b; 
             end
             
         end
         
-        function R = SO3(rot_mat)
-           assert(size(rot_mat, 1) == SO3.dim);
-           assert(size(rot_mat, 2) == SO3.dim);
-           R.matrix = rot_mat;
-        end
-
         function w = log(R)
             theta = acos((trace(R.matrix) - 1) / 2);
             if theta == 0
                 w = [0; 0; 0];
             else
-                w = theta * SO3.vee(R.matrix - R.matrix') / (2 * sin(theta));
+                w = theta/(2 * sin(theta)) * SO3.vee(R.matrix - R.matrix');
             end
-            
         end
 
         function Ad = adjoint(R)
@@ -37,8 +38,7 @@ classdef SO3
         end
 
         function R_inv = inverse(R)
-            R_inv = R;
-            R_inv.matrix = R.matrix;
+            R_inv = SO3(R.matrix');
         end
    end
    
@@ -50,13 +50,17 @@ classdef SO3
         end
 
         function w = vee(wx)
-            w = [wx(3, 2); wx(1, 3); wx(1,2)];
+            w = [wx(3, 2); wx(1, 3); wx(2,1)];
         end
 
         function R = exp(w)
            theta = norm(w);
-           wx = SO3.hat(w / theta);
-           R = SO3(eye(3) + wx * sin(theta) + wx^2 * (1 - cos(theta)));
+           if theta == 0
+               R = SO3.identity();
+           else
+               wx = SO3.hat(w / theta);
+               R = SO3(eye(3) + wx * sin(theta) + wx^2 * (1 - cos(theta)));
+           end
         end
         
         function R = identity()

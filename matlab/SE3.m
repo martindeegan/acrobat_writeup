@@ -83,7 +83,7 @@ classdef SE3
                       zeros(1, 3),      0];
         end
 
-        % Converts the se3 representation of the Lie algebra into the R^3
+        % Converts the se3 representation of the Lie algebra into the R^6
         % representation of the Lie algebra
         % xi_hat: se3 matrix - 4x4 matrix.
         function xi = vee(xi_hat)

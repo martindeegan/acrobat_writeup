@@ -13,13 +13,24 @@ classdef SE3
         % R*R' == eye(3)
         % t: translation - 3x1 array
         function T = SE3(R, t)
-           if isa(R, 'SO3')
-               T.R = R;
-           else
-               T.R = SO3(R);
+           switch nargin
+               case 2
+                  if isa(R, 'SO3')
+                    T.R = R;
+                  else
+                    T.R = SO3(R);
+                  end
+                  T.t = t;
+               case 1
+                  if isa(T, 'SE3')
+                    T = T_in;
+                  else
+                    T.R = SO3(T_in(1:3, 1:3));
+                    T.t = T_in(1:3, 4);
+                  end
            end
-           T.t = t;
         end
+        
 
         % Group binary operation
         % Group action on R^3
@@ -101,10 +112,10 @@ classdef SE3
            w = xi(4:6);           
            theta = norm(w);
            if theta == 0
-               V = eye(3)
+               V = eye(3);
            else
                ux = SO3.hat(w / theta);
-               V = eye(3) + (1 - cos(theta))/theta * ux + (theta - sin(theta))/theta * ux^2
+               V = eye(3) + (1 - cos(theta))/theta * ux + (theta - sin(theta))/theta * ux^2;
            end
            
            T = SE3(SO3.exp(w), V * rho);

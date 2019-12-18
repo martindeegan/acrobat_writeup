@@ -8,8 +8,9 @@ classdef Drone < handle
 
     properties
         T = SE3();      % Vehicle pose
-        xi = zeros(6,1); % Velocity in se3
-        F_net = zeros(6, 1);
+        vel = zeros(6,1); % Body frame velocity in se3
+        accel = zeros(6, 1); % Body frame acceleration
+        F_net = zeros(6, 1); % Body frame force
     end
 
     methods
@@ -23,21 +24,20 @@ classdef Drone < handle
         function dynamics_det(D, F_M, w, dt);
             F_g = [0; 0; -D.g * D.m]; % global frame
             F_wind = [0; 0; 0]; % global frame
-            F_drag = -D.gamma * D.xi(1:3); % body frame
+            F_drag = -D.gamma * D.vel(1:3); % body frame
             F_motor = [0; 0; F_M]; % body frame
             
             % Used to transform vectors in the tangent space
             adj = D.T.adjoint();
             D.F_net = adj(1:3, 1:3) \ (F_g + F_wind) + F_drag + F_motor; % body frame
+            D.accel = [D.F_net / D.m; zeros(3, 1)];
             
-            accel_body = [D.F_net / D.m; zeros(3, 1)];
-            
-            vel_body = D.xi + accel_body * dt;
-            vel_body(4:6) = w;
+            % Set angular rate to control input
+            D.vel(4:6) = w;
             
             % Double integrate acceleration
-            D.T = D.T * SE3.exp(vel_body * dt + 1/2 * dt^2 + accel_body);
-            D.xi = vel_body;
+            D.T = D.T * SE3.exp(D.vel * dt + 1/2 * dt^2 + D.accel);
+            D.vel = D.vel + dt * D.accel;
         end
 
         % Adds perturbations to force 

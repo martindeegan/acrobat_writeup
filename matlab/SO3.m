@@ -50,6 +50,12 @@ classdef SO3
         function R_inv = inverse(R)
             R_inv = SO3(R.matrix');
         end
+
+        % Returns the Euler angles
+        % eul = [roll, pitch, yaw]
+        function e = eul(R)
+            e = flip(rotm2eul(R.matrix))';
+        end
    end
    
    methods(Static)

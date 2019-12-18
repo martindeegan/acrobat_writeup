@@ -6,7 +6,7 @@ viz = figure('Renderer', 'painters', 'Position', [10 10 900 600])
 
 
 SIM_STEPS = 200;
-STEP_SIZE = 0.01; % Seconds
+STEP_SIZE = 0.001; % Seconds
 SIM_WAIT = true; % Wait in loop to have a consistent framerate
 SIM_RENDER = true; % Enable/Disable rendering to speedup
 
@@ -17,6 +17,8 @@ poses = {};
 positions = [];
 times = []
 
+D = Drone;
+
 t = 0;
 for step = 1:SIM_STEPS
     tic
@@ -25,20 +27,25 @@ for step = 1:SIM_STEPS
     % Simulate
     % ====================
     
-    % Integrate some arbitrary twist vector
-    T = T * SE3.exp(xi(t));
+    % Oscillate up and down
+    F_M = 9.8 + 0.1 * sin(step * 0.1) + 1/(2*step);
     
+    ang_vel_mag = 0.2;
+    w = ang_vel_mag * randn(3, 1);
+%     w = [ang_vel_mag * sin(step * 0.1); ang_vel_mag * cos(step * 0.1); 0];
+    D.dynamics_det(F_M, w, STEP_SIZE);
+        
     % ====================
     % Record data
     % ====================
     
     % Save the pose every 15 steps
-    if mod(step, 15) == 1
-        poses = cat(1, poses, {T});
+    if mod(step, 30) == 1
+        poses = cat(1, poses, {D.T});
     end
     
     % Save positions
-    positions = [positions, T.t];
+    positions = [positions, D.T.t];
 
     
     % ====================
@@ -48,7 +55,7 @@ for step = 1:SIM_STEPS
     if SIM_RENDER
         initialize_viz(viz)
 
-        plot_drone(viz, T, 0.5);
+        plot_drone(viz, D, 0.5);
 
         for i = 1:length(poses)
             plot_pose(viz, poses{i}, 0.3);
@@ -60,8 +67,8 @@ for step = 1:SIM_STEPS
     end
 
     % Increase sim time
-    t = t + STEP_SIZE;
     times = [times, t];
+    t = t + STEP_SIZE;
     
     elapsed = toc;
     if elapsed < STEP_SIZE && SIM_WAIT && SIM_RENDER
@@ -76,7 +83,7 @@ end
 % Do final render of visualizer
 initialize_viz(viz)
 
-plot_drone(viz, T, 0.5);
+plot_drone(viz, D, 0.5);
 for i = 1:length(poses)
     plot_pose(viz, poses{i}, 0.3);
 end

@@ -1,4 +1,4 @@
-function plot_drone(fig, T, length)
+function plot_drone(fig, D, length)
     if nargin == 3
         arm_length = length;
     else
@@ -11,16 +11,16 @@ function plot_drone(fig, T, length)
             0.707  0.707 -0.707 -0.707;
             0      0      0      0    ];
         
-    arms_transformed = T * arms;
+    arms_transformed = D.T * arms;
     
     color = ['r', 'g', 'g', 'r'];
     line_width = 2.5;
     motor_size = 15.0;
     for i = 1:4
         % Plot arm
-        plot3([T.t(1), arms_transformed(1,i)], ... 
-              [T.t(2), arms_transformed(2,i)], ...
-              [T.t(3), arms_transformed(3,i)], ...
+        plot3([D.T.t(1), arms_transformed(1,i)], ... 
+              [D.T.t(2), arms_transformed(2,i)], ...
+              [D.T.t(3), arms_transformed(3,i)], ...
               'Color', color(i), ...
               'LineWidth', line_width);
           
@@ -34,5 +34,5 @@ function plot_drone(fig, T, length)
 
     end
     
-    plot_pose(fig, T, arm_length)
+    plot_pose(fig, D.T, arm_length)
 end

@@ -93,6 +93,13 @@ classdef SO3
         function R = identity()
             R = SO3(eye(3));
         end
+        
+        function J_r_inv = right_jacobain_inv(Phi)
+            phi = norm(Phi);
+            a = Phi / phi;
+            
+            J_r_inv = (phi/2) * cot(phi/2) * eye(3) + (1 - phi/2 * cot(phi/2))*(a*a') + (phi/2)*SO3.hat(a);
+        end
    end
 end
 
